@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    *{margin: 0; padding:0;}
+    .wrap{
+      width: 800px;
+      height: 300px;
+      border:1px solid #ccc;
+      margin: 50px auto;
+      display: flex;
+    }
+    .left{
+      width: 200px;
+      border-right: 1px solid #ccc;
+    }
+    .right{
+      width: 600px;
+    }
+    input{
+      display: block;
+      width: 800px;
+      border: 1px solid #ccc;
+      margin: 50px auto;
+      border-radius: 10px;
+      height: 50px;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <input id="ipt" type="text" placeholder="随便说说吧">
+
+  <div class="wrap">
+    <div class="left" id="enter"></div>
+    <div class="right" id="message"></div>
+  </div>
+</body>
+</html>
+<script>
+
+ // 客户端连接服务端
+ const ws = new WebSocket('ws://10.2yuecloud.com:3003')
+
+ // 监听服务端连接成功
+ ws.addEventListener('open', ()=>{
+  console.log('客户端连接成功')
+ })
+
+ // 监听服务端关闭连接
+ ws.addEventListener('close', ()=>{
+  console.log('服务端断开了连接')
+ })
+
+ // 监听服务端返回的消息
+ ws.addEventListener('message', (e)=>{
+  const data = JSON.parse(e.data)
+  console.log(data)
+
+  if(data.type === 'enter'){
+    document.getElementById('enter').innerHTML += ('<div>' + data.data  +'</div>')
+  }else if(data.type === 'message'){
+    document.getElementById('message').innerHTML += ('<div>' + data.data  +'</div>')
+  }else if(data.type === 'leave'){
+    document.getElementById('enter').innerHTML += ('<div>' + data.data  +'</div>')
+  }
+ })
+
+ const ipt = document.getElementById('ipt')
+ ipt.onkeyup = (e) => {
+  if(e.keyCode === 13){
+    ipt.value && ws.send(ipt.value)
+  }
+ }
+
+</script>
